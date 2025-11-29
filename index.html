@@ -1,0 +1,2563 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <title>DRE – Calculadora Simples</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+      :root {
+        --bg: #020617;
+        --card: #02091b;
+        --border: #1e293b;
+        --accent: #0ea5e9;
+        --accent-soft: rgba(14, 165, 233, 0.12);
+        --text: #e5e7eb;
+        --muted: #94a3b8;
+        --danger: #f97373;
+      }
+
+      * {
+        box-sizing: border-box;
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+          sans-serif;
+      }
+
+      body {
+        margin: 0;
+        background: radial-gradient(
+          circle at top,
+          #0f172a 0,
+          #020617 45%,
+          #000 100%
+        );
+        color: var(--text);
+        min-height: 100vh;
+        display: flex;
+        align-items: flex-start;
+        justify-content: center;
+        padding: 24px 12px 40px;
+      }
+
+      .container {
+        width: 100%;
+        max-width: 1120px;
+      }
+
+      .header {
+        margin-bottom: 24px;
+      }
+
+      .title {
+        font-size: 1.8rem;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .title-pill {
+        font-size: 0.72rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        padding: 4px 8px;
+        border-radius: 999px;
+        background: var(--accent-soft);
+        color: var(--accent);
+        border: 1px solid rgba(14, 165, 233, 0.4);
+      }
+
+      .subtitle {
+        margin-top: 6px;
+        font-size: 0.9rem;
+        color: var(--muted);
+      }
+
+      .periodo-row {
+        margin-top: 14px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        align-items: center;
+      }
+
+      .periodo-row label {
+        font-size: 0.8rem;
+        color: var(--muted);
+      }
+
+      input[type="month"] {
+        background: #020617;
+        border-radius: 8px;
+        border: 1px solid var(--border);
+        padding: 6px 10px;
+        color: var(--text);
+        font-size: 0.9rem;
+      }
+
+      input[type="month"]:focus {
+        outline: 1px solid var(--accent);
+        border-color: var(--accent);
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+        gap: 18px;
+        margin-bottom: 18px;
+      }
+
+      @media (max-width: 900px) {
+        .grid {
+          grid-template-columns: minmax(0, 1fr);
+        }
+      }
+
+      .card {
+        background: rgba(2, 6, 23, 0.95);
+        border-radius: 18px;
+        border: 1px solid var(--border);
+        padding: 16px 16px 18px;
+        box-shadow: 0 18px 45px rgba(15, 23, 42, 0.8);
+      }
+
+      .card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        margin-bottom: 12px;
+      }
+
+      .card-title {
+        font-size: 1rem;
+        font-weight: 600;
+      }
+
+      .card-tag {
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--muted);
+      }
+
+      .field-group {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        margin-top: 4px;
+      }
+
+      .field {
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+      }
+
+      .field-label {
+        font-size: 0.78rem;
+        color: var(--muted);
+      }
+
+      .field input[type="number"] {
+        border-radius: 8px;
+        background: #020617;
+        border: 1px solid var(--border);
+        padding: 7px 10px;
+        color: var(--text);
+        font-size: 0.9rem;
+      }
+
+      .field input[type="number"]:focus {
+        outline: 1px solid var(--accent);
+        border-color: var(--accent);
+      }
+
+      .field small {
+        font-size: 0.7rem;
+        color: #64748b;
+      }
+
+      .inline-summary {
+        margin-top: 10px;
+        padding-top: 8px;
+        border-top: 1px dashed rgba(148, 163, 184, 0.6);
+        font-size: 0.8rem;
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+      }
+
+      .inline-summary strong {
+        font-weight: 600;
+      }
+
+      .inline-summary span {
+        display: flex;
+        justify-content: space-between;
+        gap: 8px;
+      }
+
+      .inline-summary span .value {
+        font-variant-numeric: tabular-nums;
+      }
+
+      .highlight {
+        color: var(--accent);
+        font-weight: 600;
+      }
+
+      .summary-card {
+        margin-top: 4px;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.8rem;
+        margin-top: 8px;
+      }
+
+      th,
+      td {
+        padding: 6px 4px;
+        text-align: left;
+        border-bottom: 1px solid rgba(30, 64, 175, 0.35);
+      }
+
+      th {
+        font-size: 0.75rem;
+        color: var(--muted);
+        font-weight: 500;
+      }
+
+      tbody tr:last-child td {
+        border-bottom: none;
+      }
+
+      .row-strong {
+        font-weight: 600;
+      }
+
+      .row-negative {
+        color: var(--danger);
+      }
+
+      .text-right {
+        text-align: right;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .footer-actions {
+        margin-top: 16px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        justify-content: flex-end;
+        align-items: center;
+        font-size: 0.75rem;
+        color: var(--muted);
+      }
+
+      .btn {
+        border-radius: 999px;
+        background: linear-gradient(135deg, #0ea5e9, #22c55e);
+        border: none;
+        padding: 7px 14px;
+        font-size: 0.78rem;
+        font-weight: 600;
+        color: #0b1120;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        box-shadow: 0 10px 30px rgba(34, 197, 94, 0.35);
+      }
+
+      .btn span {
+        font-size: 0.9em;
+      }
+
+      .btn:active {
+        transform: translateY(1px);
+        box-shadow: 0 6px 18px rgba(34, 197, 94, 0.4);
+      }
+
+      .hint {
+        opacity: 0.9;
+      }
+
+      .copied {
+        color: #4ade80;
+        font-weight: 500;
+      }
+
+      .btn-secondary {
+        background: linear-gradient(135deg, #64748b, #475569);
+        box-shadow: 0 10px 30px rgba(100, 116, 139, 0.35);
+      }
+
+      .btn-secondary:active {
+        box-shadow: 0 6px 18px rgba(100, 116, 139, 0.4);
+      }
+
+      input[type="number"] {
+        background: #020617;
+        border-radius: 8px;
+        border: 1px solid var(--border);
+        padding: 6px 10px;
+        color: var(--text);
+        font-size: 0.9rem;
+      }
+
+      input[type="number"]:focus {
+        outline: 1px solid var(--accent);
+        border-color: var(--accent);
+      }
+
+      .ano-consolidado {
+        margin-top: 24px;
+        border-top: 2px solid var(--border);
+        padding-top: 24px;
+      }
+
+      .ano-consolidado .card-title {
+        font-size: 1.1rem;
+        color: var(--accent);
+      }
+
+      .meses-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+        gap: 8px;
+        margin-top: 12px;
+        padding: 12px;
+        background: rgba(2, 9, 27, 0.5);
+        border-radius: 12px;
+        border: 1px solid var(--border);
+      }
+
+      .mes-item {
+        padding: 8px;
+        border-radius: 8px;
+        text-align: center;
+        font-size: 0.75rem;
+        cursor: pointer;
+        transition: all 0.2s;
+        border: 1px solid transparent;
+        background: rgba(30, 41, 59, 0.3);
+      }
+
+      .mes-item:hover {
+        background: rgba(14, 165, 233, 0.15);
+        border-color: var(--accent);
+      }
+
+      .mes-item.preenchido {
+        background: rgba(34, 197, 94, 0.2);
+        border-color: rgba(34, 197, 94, 0.5);
+        color: #4ade80;
+      }
+
+      .mes-item.ativo {
+        background: var(--accent-soft);
+        border-color: var(--accent);
+        color: var(--accent);
+        font-weight: 600;
+      }
+
+      .mes-item .mes-nome {
+        font-size: 0.7rem;
+        margin-bottom: 2px;
+      }
+
+      .mes-item .mes-indicador {
+        font-size: 0.6rem;
+        opacity: 0.7;
+      }
+
+      .save-indicator {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        font-size: 0.7rem;
+        color: var(--muted);
+        margin-left: 8px;
+      }
+
+      .save-indicator.saved {
+        color: #4ade80;
+      }
+
+      .save-indicator .icon {
+        font-size: 0.8rem;
+      }
+
+      .progress-info {
+        margin-top: 8px;
+        font-size: 0.75rem;
+        color: var(--muted);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .config-section {
+        margin-bottom: 24px;
+      }
+
+      .config-section .card {
+        background: rgba(2, 6, 23, 0.95);
+        border: 1px solid var(--accent);
+        box-shadow: 0 18px 45px rgba(14, 165, 233, 0.3);
+      }
+
+      .regime-selector {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        margin-bottom: 16px;
+      }
+
+      .regime-option {
+        flex: 1;
+        min-width: 120px;
+        padding: 10px;
+        border-radius: 8px;
+        border: 2px solid var(--border);
+        background: rgba(2, 6, 23, 0.5);
+        color: var(--text);
+        cursor: pointer;
+        text-align: center;
+        font-size: 0.85rem;
+        transition: all 0.2s;
+      }
+
+      .regime-option:hover {
+        border-color: var(--accent);
+        background: rgba(14, 165, 233, 0.1);
+      }
+
+      .regime-option.selected {
+        border-color: var(--accent);
+        background: var(--accent-soft);
+        color: var(--accent);
+        font-weight: 600;
+      }
+
+      .taxas-config {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 12px;
+        margin-top: 12px;
+      }
+
+      .taxa-field {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+
+      .taxa-field label {
+        font-size: 0.75rem;
+        color: var(--muted);
+      }
+
+      .taxa-field input {
+        width: 100%;
+      }
+
+      .taxa-info {
+        font-size: 0.7rem;
+        color: #64748b;
+        margin-top: 4px;
+      }
+
+      select {
+        background: #020617;
+        border-radius: 8px;
+        border: 1px solid var(--border);
+        padding: 6px 10px;
+        color: var(--text);
+        font-size: 0.9rem;
+      }
+
+      select:focus {
+        outline: 1px solid var(--accent);
+        border-color: var(--accent);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <header class="header">
+        <div class="title">
+          DRE
+          <span class="title-pill">Calculadora simples</span>
+        </div>
+        <p class="subtitle">
+          Preencha os valores de cada mês e veja sua Demonstração de Resultado
+          em tempo real. Os dados são salvos automaticamente por mês.
+        </p>
+
+        <div class="periodo-row">
+          <label for="ano">Ano</label>
+          <input type="number" id="ano" min="2020" max="2099" value="2024" />
+          <label for="periodo">Mês atual</label>
+          <input type="month" id="periodo" />
+          <span id="saveIndicator" class="save-indicator">
+            <span class="icon">💾</span>
+            <span>Salvando...</span>
+          </span>
+          <button
+            type="button"
+            class="btn"
+            onclick="limparMesAtual()"
+            style="font-size: 0.7rem; padding: 5px 10px"
+          >
+            <span>🗑️</span>
+            <span>Limpar mês</span>
+          </button>
+        </div>
+
+        <div class="meses-grid" id="mesesGrid"></div>
+        <div class="progress-info">
+          <span
+            >Progresso do ano:
+            <strong id="progressoTexto">0/12 meses</strong></span
+          >
+          <span id="totalMesesPreenchidos"></span>
+        </div>
+      </header>
+
+      <!-- CONFIGURAÇÃO DE REGIME TRIBUTÁRIO -->
+      <section class="card config-section">
+        <div class="card-header">
+          <h2 class="card-title">Configuração de Regime Tributário</h2>
+          <span class="card-tag">Configuração única</span>
+        </div>
+
+        <div class="regime-selector">
+          <div
+            class="regime-option"
+            data-regime="simples"
+            onclick="selecionarRegime('simples')"
+          >
+            Simples Nacional
+          </div>
+          <div
+            class="regime-option"
+            data-regime="presumido"
+            onclick="selecionarRegime('presumido')"
+          >
+            Lucro Presumido
+          </div>
+          <div
+            class="regime-option"
+            data-regime="real"
+            onclick="selecionarRegime('real')"
+          >
+            Lucro Real
+          </div>
+        </div>
+
+        <!-- Simples Nacional -->
+        <div id="configSimples" class="taxas-config" style="display: none">
+          <div class="taxa-field">
+            <label for="simplesAliquota">Alíquota Simples Nacional (%)</label>
+            <input
+              type="number"
+              id="simplesAliquota"
+              min="0"
+              max="100"
+              step="0.01"
+              placeholder="6,00"
+            />
+            <small class="taxa-info"
+              >Alíquota efetiva do Simples Nacional (ex: 6% para
+              serviços)</small
+            >
+          </div>
+        </div>
+
+        <!-- Lucro Presumido -->
+        <div id="configPresumido" class="taxas-config" style="display: none">
+          <div class="taxa-field">
+            <label for="presumidoIR">IRPJ (%)</label>
+            <input
+              type="number"
+              id="presumidoIR"
+              min="0"
+              max="100"
+              step="0.01"
+              placeholder="1,20"
+            />
+            <small class="taxa-info">Imposto de Renda Pessoa Jurídica</small>
+          </div>
+          <div class="taxa-field">
+            <label for="presumidoCSLL">CSLL (%)</label>
+            <input
+              type="number"
+              id="presumidoCSLL"
+              min="0"
+              max="100"
+              step="0.01"
+              placeholder="1,08"
+            />
+            <small class="taxa-info"
+              >Contribuição Social sobre o Lucro Líquido</small
+            >
+          </div>
+          <div class="taxa-field">
+            <label for="presumidoPIS">PIS (%)</label>
+            <input
+              type="number"
+              id="presumidoPIS"
+              min="0"
+              max="100"
+              step="0.01"
+              placeholder="0,65"
+            />
+            <small class="taxa-info">Programa de Integração Social</small>
+          </div>
+          <div class="taxa-field">
+            <label for="presumidoCOFINS">COFINS (%)</label>
+            <input
+              type="number"
+              id="presumidoCOFINS"
+              min="0"
+              max="100"
+              step="0.01"
+              placeholder="3,00"
+            />
+            <small class="taxa-info"
+              >Contribuição para o Financiamento da Seguridade Social</small
+            >
+          </div>
+        </div>
+
+        <!-- Lucro Real -->
+        <div id="configReal" class="taxas-config" style="display: none">
+          <div class="taxa-field">
+            <label for="realIR">IRPJ (%)</label>
+            <input
+              type="number"
+              id="realIR"
+              min="0"
+              max="100"
+              step="0.01"
+              placeholder="15,00"
+            />
+            <small class="taxa-info"
+              >Imposto de Renda Pessoa Jurídica (15% sobre o lucro)</small
+            >
+          </div>
+          <div class="taxa-field">
+            <label for="realCSLL">CSLL (%)</label>
+            <input
+              type="number"
+              id="realCSLL"
+              min="0"
+              max="100"
+              step="0.01"
+              placeholder="9,00"
+            />
+            <small class="taxa-info"
+              >Contribuição Social sobre o Lucro Líquido (9% sobre o
+              lucro)</small
+            >
+          </div>
+          <div class="taxa-field">
+            <label for="realPIS">PIS (%)</label>
+            <input
+              type="number"
+              id="realPIS"
+              min="0"
+              max="100"
+              step="0.01"
+              placeholder="1,65"
+            />
+            <small class="taxa-info"
+              >Programa de Integração Social (sobre receita)</small
+            >
+          </div>
+          <div class="taxa-field">
+            <label for="realCOFINS">COFINS (%)</label>
+            <input
+              type="number"
+              id="realCOFINS"
+              min="0"
+              max="100"
+              step="0.01"
+              placeholder="7,60"
+            />
+            <small class="taxa-info"
+              >Contribuição para o Financiamento da Seguridade Social (sobre
+              receita)</small
+            >
+          </div>
+        </div>
+
+        <div class="inline-summary" style="margin-top: 12px">
+          <span>
+            <strong>Impostos calculados automaticamente</strong>
+            <span class="value" id="impostosCalculadosText">R$ 0,00</span>
+          </span>
+          <small style="color: var(--muted); margin-top: 4px; display: block"
+            >Os impostos serão calculados automaticamente em todos os meses
+            baseado no regime selecionado e nas taxas configuradas acima.</small
+          >
+        </div>
+
+        <!-- Configuração de Deduções de Vendas e Resultado Financeiro -->
+        <div
+          style="
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border);
+          "
+        >
+          <div
+            class="taxas-config"
+            style="grid-template-columns: repeat(2, 1fr)"
+          >
+            <div class="taxa-field">
+              <label for="percentualDeducoesVendas">
+                Percentual de Deduções de Vendas (%)
+              </label>
+              <input
+                type="number"
+                id="percentualDeducoesVendas"
+                min="0"
+                max="100"
+                step="0.01"
+                placeholder="0,00"
+              />
+              <small class="taxa-info"
+                >Percentual sobre a receita bruta para calcular deduções de
+                vendas (impostos, taxas, etc.) automaticamente</small
+              >
+            </div>
+            <div class="taxa-field">
+              <label for="percentualResultadoFinanceiro">
+                Percentual de Resultado Financeiro (%)
+              </label>
+              <input
+                type="number"
+                id="percentualResultadoFinanceiro"
+                min="-100"
+                max="100"
+                step="0.01"
+                placeholder="0,00"
+              />
+              <small class="taxa-info"
+                >Percentual sobre a receita bruta para calcular resultado
+                financeiro (juros, rendimentos, multas, etc.) automaticamente.
+                Pode ser negativo.</small
+              >
+            </div>
+          </div>
+          <div class="inline-summary" style="margin-top: 12px">
+            <span>
+              <strong>Deduções calculadas</strong>
+              <span class="value" id="deducoesCalculadasText">R$ 0,00</span>
+            </span>
+            <span>
+              <strong>Resultado financeiro calculado</strong>
+              <span class="value" id="resultadoFinanceiroCalculadoText"
+                >R$ 0,00</span
+              >
+            </span>
+          </div>
+        </div>
+      </section>
+
+      <!-- GRID PRINCIPAL -->
+      <div class="grid">
+        <!-- RECEITAS -->
+        <section class="card">
+          <div class="card-header">
+            <h2 class="card-title">Receitas por produto</h2>
+            <span class="card-tag">Entrada de dados</span>
+          </div>
+
+          <div class="field-group">
+            <div class="field">
+              <label class="field-label" for="receitaVps">Receita VPS</label>
+              <input
+                type="number"
+                id="receitaVps"
+                min="0"
+                step="0.01"
+                placeholder="0,00"
+              />
+            </div>
+
+            <div class="field">
+              <label class="field-label" for="receitaCloud"
+                >Receita Cloud Server</label
+              >
+              <input
+                type="number"
+                id="receitaCloud"
+                min="0"
+                step="0.01"
+                placeholder="0,00"
+              />
+            </div>
+
+            <div class="field">
+              <label class="field-label" for="receitaDedicado"
+                >Receita Servidor Dedicado</label
+              >
+              <input
+                type="number"
+                id="receitaDedicado"
+                min="0"
+                step="0.01"
+                placeholder="0,00"
+              />
+            </div>
+
+            <div class="field">
+              <label class="field-label" for="receitaTrader"
+                >Receita VPS Trader</label
+              >
+              <input
+                type="number"
+                id="receitaTrader"
+                min="0"
+                step="0.01"
+                placeholder="0,00"
+              />
+            </div>
+
+            <div class="field">
+              <label class="field-label" for="outrasReceitas">
+                Outras receitas (hospedagem, revenda, etc.)
+              </label>
+              <input
+                type="number"
+                id="outrasReceitas"
+                min="0"
+                step="0.01"
+                placeholder="0,00"
+              />
+            </div>
+          </div>
+
+          <div class="inline-summary">
+            <span>
+              <strong>Receita Bruta</strong>
+              <span class="value" id="receitaBrutaText">R$ 0,00</span>
+            </span>
+          </div>
+        </section>
+
+        <!-- DEDUÇÕES + CUSTO -->
+        <section class="card">
+          <div class="card-header">
+            <h2 class="card-title">Deduções e custo dos serviços</h2>
+            <span class="card-tag">Entrada de dados</span>
+          </div>
+
+          <div class="field-group">
+            <div class="field">
+              <label class="field-label" for="deducoesVendas">
+                Deduções de vendas (impostos, taxas, etc.)
+              </label>
+              <input
+                type="number"
+                id="deducoesVendas"
+                min="0"
+                step="0.01"
+                placeholder="0,00"
+                readonly
+                style="background: rgba(30, 41, 59, 0.5); cursor: not-allowed"
+              />
+              <small style="color: var(--accent)"
+                >Calculado automaticamente baseado no percentual
+                configurado</small
+              >
+            </div>
+
+            <div class="field">
+              <label class="field-label" for="custoServicos">
+                Custo dos serviços (datacenter, licenças, energia, tráfego…)
+              </label>
+              <input
+                type="number"
+                id="custoServicos"
+                min="0"
+                step="0.01"
+                placeholder="0,00"
+              />
+              <small
+                >Somar apenas o que é direto para manter VPS/Cloud/Dedicado no
+                ar.</small
+              >
+            </div>
+          </div>
+
+          <div class="inline-summary">
+            <span>
+              Receita Líquida
+              <span class="value highlight" id="receitaLiquidaText"
+                >R$ 0,00</span
+              >
+            </span>
+            <span>
+              Lucro Bruto
+              <span class="value" id="lucroBrutoText">R$ 0,00</span>
+            </span>
+          </div>
+        </section>
+      </div>
+
+      <div class="grid">
+        <!-- DESPESAS OPERACIONAIS -->
+        <section class="card">
+          <div class="card-header">
+            <h2 class="card-title">Despesas operacionais</h2>
+            <span class="card-tag">Entrada de dados</span>
+          </div>
+
+          <div class="field-group">
+            <div class="field">
+              <label class="field-label" for="despesasComerciais">
+                Despesas Comerciais
+              </label>
+              <input
+                type="number"
+                id="despesasComerciais"
+                min="0"
+                step="0.01"
+                placeholder="0,00"
+              />
+              <small>Vendas, comissões, atendimento ao cliente, etc.</small>
+            </div>
+
+            <!-- Despesas Administrativas Detalhadas -->
+            <div
+              class="field"
+              style="
+                margin-top: 8px;
+                padding-top: 8px;
+                border-top: 1px dashed rgba(148, 163, 184, 0.3);
+              "
+            >
+              <label
+                class="field-label"
+                style="font-weight: 600; color: var(--accent)"
+              >
+                Despesas Administrativas
+              </label>
+            </div>
+
+            <div class="field">
+              <label class="field-label" for="admSalarios">
+                Salários e Encargos Administrativos
+              </label>
+              <input
+                type="number"
+                id="admSalarios"
+                min="0"
+                step="0.01"
+                placeholder="0,00"
+              />
+              <small
+                >Salários, 13º, férias, encargos sociais da equipe
+                administrativa</small
+              >
+            </div>
+
+            <div class="field">
+              <label class="field-label" for="admAluguel">
+                Aluguel e Utilidades
+              </label>
+              <input
+                type="number"
+                id="admAluguel"
+                min="0"
+                step="0.01"
+                placeholder="0,00"
+              />
+              <small
+                >Aluguel do escritório, água, luz, telefone, internet,
+                etc.</small
+              >
+            </div>
+
+            <div class="field">
+              <label class="field-label" for="admContabilidade">
+                Contabilidade e Legal
+              </label>
+              <input
+                type="number"
+                id="admContabilidade"
+                min="0"
+                step="0.01"
+                placeholder="0,00"
+              />
+              <small>Honorários contábeis, jurídicos, consultorias, etc.</small>
+            </div>
+
+            <div class="field">
+              <label class="field-label" for="admTI">
+                TI e Infraestrutura
+              </label>
+              <input
+                type="number"
+                id="admTI"
+                min="0"
+                step="0.01"
+                placeholder="0,00"
+              />
+              <small
+                >Software, licenças, servidores, equipamentos de TI, etc.</small
+              >
+            </div>
+
+            <div class="field">
+              <label class="field-label" for="admMaterial">
+                Material de Escritório e Suprimentos
+              </label>
+              <input
+                type="number"
+                id="admMaterial"
+                min="0"
+                step="0.01"
+                placeholder="0,00"
+              />
+              <small>Material de escritório, suprimentos, etc.</small>
+            </div>
+
+            <div class="field">
+              <label class="field-label" for="admOutras">
+                Outras Despesas Administrativas
+              </label>
+              <input
+                type="number"
+                id="admOutras"
+                min="0"
+                step="0.01"
+                placeholder="0,00"
+              />
+              <small>Outras despesas administrativas não categorizadas</small>
+            </div>
+
+            <div class="field">
+              <label class="field-label" for="despesasAdministrativas">
+                Total Despesas Administrativas
+              </label>
+              <input
+                type="number"
+                id="despesasAdministrativas"
+                min="0"
+                step="0.01"
+                placeholder="0,00"
+                readonly
+                style="
+                  background: rgba(30, 41, 59, 0.5);
+                  cursor: not-allowed;
+                  font-weight: 600;
+                "
+              />
+              <small style="color: var(--accent)"
+                >Calculado automaticamente pela soma dos campos acima</small
+              >
+            </div>
+
+            <div class="field">
+              <label class="field-label" for="despesasPD">
+                P&amp;D (Pesquisa e Desenvolvimento)
+              </label>
+              <input
+                type="number"
+                id="despesasPD"
+                min="0"
+                step="0.01"
+                placeholder="0,00"
+              />
+              <small>Desenvolvimento de produtos, inovação, etc.</small>
+            </div>
+
+            <div class="field">
+              <label class="field-label" for="despesasMarketing">
+                Marketing e Publicidade
+              </label>
+              <input
+                type="number"
+                id="despesasMarketing"
+                min="0"
+                step="0.01"
+                placeholder="0,00"
+              />
+              <small>Anúncios, campanhas, redes sociais, etc.</small>
+            </div>
+
+            <div class="field">
+              <label class="field-label" for="outrasDespesasOperacionais">
+                Outras Despesas Operacionais
+              </label>
+              <input
+                type="number"
+                id="outrasDespesasOperacionais"
+                min="0"
+                step="0.01"
+                placeholder="0,00"
+              />
+              <small>Outras despesas não categorizadas acima</small>
+            </div>
+
+            <div class="field">
+              <label class="field-label" for="despesasOperacionais">
+                Total de Despesas Operacionais
+              </label>
+              <input
+                type="number"
+                id="despesasOperacionais"
+                min="0"
+                step="0.01"
+                placeholder="0,00"
+                readonly
+                style="
+                  background: rgba(30, 41, 59, 0.5);
+                  cursor: not-allowed;
+                  font-weight: 600;
+                "
+              />
+              <small style="color: var(--accent)"
+                >Calculado automaticamente pela soma dos campos acima</small
+              >
+            </div>
+          </div>
+
+          <div class="inline-summary">
+            <span>
+              Resultado Operacional
+              <span class="value" id="resultadoOperacionalText">R$ 0,00</span>
+            </span>
+          </div>
+        </section>
+
+        <!-- FINANCEIRO + IMPOSTO -->
+        <section class="card">
+          <div class="card-header">
+            <h2 class="card-title">Resultado financeiro e impostos</h2>
+            <span class="card-tag">Entrada de dados</span>
+          </div>
+
+          <div class="field-group">
+            <div class="field">
+              <label class="field-label" for="resultadoFinanceiro">
+                Resultado financeiro (juros, rendimentos, multas…)
+              </label>
+              <input
+                type="number"
+                id="resultadoFinanceiro"
+                step="0.01"
+                placeholder="0,00"
+                readonly
+                style="background: rgba(30, 41, 59, 0.5); cursor: not-allowed"
+              />
+              <small style="color: var(--accent)"
+                >Calculado automaticamente baseado no percentual configurado.
+                Pode ser positivo (ganho) ou negativo (despesa).</small
+              >
+            </div>
+
+            <div class="field">
+              <label class="field-label" for="impostoRenda">
+                IR / CSLL / Pro-labore (total do período)
+              </label>
+              <input
+                type="number"
+                id="impostoRenda"
+                min="0"
+                step="0.01"
+                placeholder="0,00"
+                readonly
+                style="background: rgba(30, 41, 59, 0.5); cursor: not-allowed"
+              />
+              <small style="color: var(--accent)"
+                >Calculado automaticamente baseado no regime tributário
+                configurado</small
+              >
+            </div>
+          </div>
+
+          <div class="inline-summary">
+            <span>
+              Resultado antes do IR
+              <span class="value" id="resultadoAntesIrText">R$ 0,00</span>
+            </span>
+            <span>
+              Lucro Líquido
+              <span class="value highlight" id="lucroLiquidoText">R$ 0,00</span>
+            </span>
+          </div>
+        </section>
+      </div>
+
+      <!-- RESUMO TABELADO -->
+      <section class="card summary-card">
+        <div class="card-header">
+          <h2 class="card-title">
+            Resumo da DRE – <span id="periodoTexto">sem período</span>
+          </h2>
+          <span class="card-tag">Visão geral</span>
+        </div>
+
+        <table>
+          <thead>
+            <tr>
+              <th>Linha</th>
+              <th class="text-right">Valor</th>
+              <th class="text-right">% Receita Líquida</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Receita Bruta</td>
+              <td class="text-right" id="tbReceitaBruta">R$ 0,00</td>
+              <td class="text-right" id="tbPctReceitaBruta">–</td>
+            </tr>
+            <tr class="row-negative">
+              <td>(-) Deduções de vendas</td>
+              <td class="text-right" id="tbDeducoes">R$ 0,00</td>
+              <td class="text-right" id="tbPctDeducoes">–</td>
+            </tr>
+            <tr class="row-strong">
+              <td>Receita Líquida</td>
+              <td class="text-right" id="tbReceitaLiquida">R$ 0,00</td>
+              <td class="text-right" id="tbPctReceitaLiquida">100%</td>
+            </tr>
+            <tr class="row-negative">
+              <td>(-) Custo dos serviços</td>
+              <td class="text-right" id="tbCustoServicos">R$ 0,00</td>
+              <td class="text-right" id="tbPctCustoServicos">–</td>
+            </tr>
+            <tr class="row-strong">
+              <td>Lucro Bruto</td>
+              <td class="text-right" id="tbLucroBruto">R$ 0,00</td>
+              <td class="text-right" id="tbPctLucroBruto">–</td>
+            </tr>
+            <tr class="row-negative">
+              <td>(-) Despesas operacionais</td>
+              <td class="text-right" id="tbDespesasOperacionais">R$ 0,00</td>
+              <td class="text-right" id="tbPctDespesasOperacionais">–</td>
+            </tr>
+            <tr>
+              <td>Resultado operacional</td>
+              <td class="text-right" id="tbResultadoOperacional">R$ 0,00</td>
+              <td class="text-right" id="tbPctResultadoOperacional">–</td>
+            </tr>
+            <tr>
+              <td>(+/-) Resultado financeiro</td>
+              <td class="text-right" id="tbResultadoFinanceiro">R$ 0,00</td>
+              <td class="text-right" id="tbPctResultadoFinanceiro">–</td>
+            </tr>
+            <tr>
+              <td>Resultado antes do IR</td>
+              <td class="text-right" id="tbResultadoAntesIr">R$ 0,00</td>
+              <td class="text-right" id="tbPctResultadoAntesIr">–</td>
+            </tr>
+            <tr class="row-negative">
+              <td>(-) IR / CSLL / Pro-labore</td>
+              <td class="text-right" id="tbImpostoRenda">R$ 0,00</td>
+              <td class="text-right" id="tbPctImpostoRenda">–</td>
+            </tr>
+            <tr class="row-strong">
+              <td>Lucro Líquido do período</td>
+              <td class="text-right" id="tbLucroLiquido">R$ 0,00</td>
+              <td class="text-right" id="tbPctLucroLiquido">–</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="footer-actions">
+          <button type="button" class="btn" onclick="copiarLinhaPlanilha()">
+            <span>📋</span>
+            <span>Copiar linha para planilha</span>
+          </button>
+          <span id="copyStatus" class="hint">
+            Copia uma linha CSV com o período + principais números. Basta colar
+            no Google Sheets.
+          </span>
+        </div>
+      </section>
+
+      <!-- RESUMO ANUAL CONSOLIDADO -->
+      <section class="card summary-card ano-consolidado">
+        <div class="card-header">
+          <h2 class="card-title">
+            Resumo Anual Consolidado – <span id="anoTexto">2024</span>
+          </h2>
+          <span class="card-tag">Visão anual</span>
+        </div>
+
+        <table>
+          <thead>
+            <tr>
+              <th>Linha</th>
+              <th class="text-right">Valor Anual</th>
+              <th class="text-right">% Receita Líquida</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Receita Bruta</td>
+              <td class="text-right" id="anoReceitaBruta">R$ 0,00</td>
+              <td class="text-right" id="anoPctReceitaBruta">–</td>
+            </tr>
+            <tr class="row-negative">
+              <td>(-) Deduções de vendas</td>
+              <td class="text-right" id="anoDeducoes">R$ 0,00</td>
+              <td class="text-right" id="anoPctDeducoes">–</td>
+            </tr>
+            <tr class="row-strong">
+              <td>Receita Líquida</td>
+              <td class="text-right" id="anoReceitaLiquida">R$ 0,00</td>
+              <td class="text-right" id="anoPctReceitaLiquida">100%</td>
+            </tr>
+            <tr class="row-negative">
+              <td>(-) Custo dos serviços</td>
+              <td class="text-right" id="anoCustoServicos">R$ 0,00</td>
+              <td class="text-right" id="anoPctCustoServicos">–</td>
+            </tr>
+            <tr class="row-strong">
+              <td>Lucro Bruto</td>
+              <td class="text-right" id="anoLucroBruto">R$ 0,00</td>
+              <td class="text-right" id="anoPctLucroBruto">–</td>
+            </tr>
+            <tr class="row-negative">
+              <td>(-) Despesas operacionais</td>
+              <td class="text-right" id="anoDespesasOperacionais">R$ 0,00</td>
+              <td class="text-right" id="anoPctDespesasOperacionais">–</td>
+            </tr>
+            <tr>
+              <td>Resultado operacional</td>
+              <td class="text-right" id="anoResultadoOperacional">R$ 0,00</td>
+              <td class="text-right" id="anoPctResultadoOperacional">–</td>
+            </tr>
+            <tr>
+              <td>(+/-) Resultado financeiro</td>
+              <td class="text-right" id="anoResultadoFinanceiro">R$ 0,00</td>
+              <td class="text-right" id="anoPctResultadoFinanceiro">–</td>
+            </tr>
+            <tr>
+              <td>Resultado antes do IR</td>
+              <td class="text-right" id="anoResultadoAntesIr">R$ 0,00</td>
+              <td class="text-right" id="anoPctResultadoAntesIr">–</td>
+            </tr>
+            <tr class="row-negative">
+              <td>(-) IR / CSLL / Pro-labore</td>
+              <td class="text-right" id="anoImpostoRenda">R$ 0,00</td>
+              <td class="text-right" id="anoPctImpostoRenda">–</td>
+            </tr>
+            <tr class="row-strong">
+              <td>Lucro Líquido do período</td>
+              <td class="text-right" id="anoLucroLiquido">R$ 0,00</td>
+              <td class="text-right" id="anoPctLucroLiquido">–</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="footer-actions">
+          <button type="button" class="btn" onclick="exportarTxtAnual()">
+            <span>📄</span>
+            <span>Exportar resumo anual (TXT)</span>
+          </button>
+          <span id="exportStatus" class="hint">
+            Gera um arquivo TXT com o resumo completo da DRE anual.
+          </span>
+        </div>
+      </section>
+    </div>
+
+    <script>
+      // Armazenamento de dados por mês
+      const dadosMensais = {};
+
+      function getStorageKey(periodo) {
+        return `dre_${periodo}`;
+      }
+
+      function getConfigKey() {
+        return "dre_config_tributaria";
+      }
+
+      // Configuração de regime tributário
+      let configTributaria = {
+        regime: "simples",
+        taxas: {
+          simples: { aliquota: 6.0 },
+          presumido: { ir: 1.2, csll: 1.08, pis: 0.65, cofins: 3.0 },
+          real: { ir: 15.0, csll: 9.0, pis: 1.65, cofins: 7.6 },
+        },
+        percentualDeducoes: 0,
+        percentualResultadoFinanceiro: 0,
+      };
+
+      function carregarConfigTributaria() {
+        const stored = localStorage.getItem(getConfigKey());
+        if (stored) {
+          configTributaria = JSON.parse(stored);
+        }
+        aplicarConfigTributaria();
+      }
+
+      function salvarConfigTributaria() {
+        localStorage.setItem(getConfigKey(), JSON.stringify(configTributaria));
+      }
+
+      function selecionarRegime(regime) {
+        configTributaria.regime = regime;
+        aplicarConfigTributaria();
+        salvarConfigTributaria();
+        calcularImpostosAutomaticos();
+      }
+
+      function aplicarConfigTributaria() {
+        // Remove seleção de todos
+        document
+          .querySelectorAll(".regime-option")
+          .forEach((el) => el.classList.remove("selected"));
+        // Seleciona o regime atual
+        const selected = document.querySelector(
+          `[data-regime="${configTributaria.regime}"]`
+        );
+        if (selected) selected.classList.add("selected");
+
+        // Mostra/esconde configurações
+        document.getElementById("configSimples").style.display =
+          configTributaria.regime === "simples" ? "grid" : "none";
+        document.getElementById("configPresumido").style.display =
+          configTributaria.regime === "presumido" ? "grid" : "none";
+        document.getElementById("configReal").style.display =
+          configTributaria.regime === "real" ? "grid" : "none";
+
+        // Preenche os campos com as taxas salvas
+        if (configTributaria.regime === "simples") {
+          document.getElementById("simplesAliquota").value =
+            configTributaria.taxas.simples.aliquota || "";
+        } else if (configTributaria.regime === "presumido") {
+          document.getElementById("presumidoIR").value =
+            configTributaria.taxas.presumido.ir || "";
+          document.getElementById("presumidoCSLL").value =
+            configTributaria.taxas.presumido.csll || "";
+          document.getElementById("presumidoPIS").value =
+            configTributaria.taxas.presumido.pis || "";
+          document.getElementById("presumidoCOFINS").value =
+            configTributaria.taxas.presumido.cofins || "";
+        } else if (configTributaria.regime === "real") {
+          document.getElementById("realIR").value =
+            configTributaria.taxas.real.ir || "";
+          document.getElementById("realCSLL").value =
+            configTributaria.taxas.real.csll || "";
+          document.getElementById("realPIS").value =
+            configTributaria.taxas.real.pis || "";
+          document.getElementById("realCOFINS").value =
+            configTributaria.taxas.real.cofins || "";
+        }
+
+        // Preenche percentual de deduções e resultado financeiro
+        document.getElementById("percentualDeducoesVendas").value =
+          configTributaria.percentualDeducoes || "";
+        document.getElementById("percentualResultadoFinanceiro").value =
+          configTributaria.percentualResultadoFinanceiro || "";
+      }
+
+      function atualizarTaxas() {
+        if (configTributaria.regime === "simples") {
+          const aliquota = getNumber("simplesAliquota");
+          configTributaria.taxas.simples.aliquota = aliquota;
+        } else if (configTributaria.regime === "presumido") {
+          configTributaria.taxas.presumido.ir = getNumber("presumidoIR");
+          configTributaria.taxas.presumido.csll = getNumber("presumidoCSLL");
+          configTributaria.taxas.presumido.pis = getNumber("presumidoPIS");
+          configTributaria.taxas.presumido.cofins =
+            getNumber("presumidoCOFINS");
+        } else if (configTributaria.regime === "real") {
+          configTributaria.taxas.real.ir = getNumber("realIR");
+          configTributaria.taxas.real.csll = getNumber("realCSLL");
+          configTributaria.taxas.real.pis = getNumber("realPIS");
+          configTributaria.taxas.real.cofins = getNumber("realCOFINS");
+        }
+
+        // Atualiza percentual de deduções e resultado financeiro
+        configTributaria.percentualDeducoes = getNumber(
+          "percentualDeducoesVendas"
+        );
+        configTributaria.percentualResultadoFinanceiro = getNumber(
+          "percentualResultadoFinanceiro"
+        );
+
+        salvarConfigTributaria();
+        calcularDeducoesAutomaticas();
+        calcularResultadoFinanceiroAutomatico();
+        calcularImpostosAutomaticos();
+      }
+
+      function calcularDeducoesAutomaticas() {
+        const receitaBruta =
+          getNumber("receitaVps") +
+          getNumber("receitaCloud") +
+          getNumber("receitaDedicado") +
+          getNumber("receitaTrader") +
+          getNumber("outrasReceitas");
+
+        const percentual = configTributaria.percentualDeducoes || 0;
+        const deducoes = (receitaBruta * percentual) / 100;
+
+        // Atualiza o campo de deduções
+        document.getElementById("deducoesVendas").value =
+          deducoes > 0 ? deducoes.toFixed(2) : "";
+        document.getElementById("deducoesCalculadasText").textContent =
+          formatMoney(deducoes);
+
+        return deducoes;
+      }
+
+      function calcularResultadoFinanceiroAutomatico() {
+        const receitaBruta =
+          getNumber("receitaVps") +
+          getNumber("receitaCloud") +
+          getNumber("receitaDedicado") +
+          getNumber("receitaTrader") +
+          getNumber("outrasReceitas");
+
+        const percentual = configTributaria.percentualResultadoFinanceiro || 0;
+        const resultadoFinanceiro = (receitaBruta * percentual) / 100;
+
+        // Atualiza o campo de resultado financeiro
+        document.getElementById("resultadoFinanceiro").value =
+          resultadoFinanceiro !== 0 ? resultadoFinanceiro.toFixed(2) : "";
+        document.getElementById(
+          "resultadoFinanceiroCalculadoText"
+        ).textContent = formatMoney(resultadoFinanceiro);
+
+        return resultadoFinanceiro;
+      }
+
+      function calcularDespesasAdministrativas() {
+        const admSalarios = getNumber("admSalarios");
+        const admAluguel = getNumber("admAluguel");
+        const admContabilidade = getNumber("admContabilidade");
+        const admTI = getNumber("admTI");
+        const admMaterial = getNumber("admMaterial");
+        const admOutras = getNumber("admOutras");
+
+        const total =
+          admSalarios +
+          admAluguel +
+          admContabilidade +
+          admTI +
+          admMaterial +
+          admOutras;
+
+        // Atualiza o campo total de despesas administrativas
+        document.getElementById("despesasAdministrativas").value =
+          total > 0 ? total.toFixed(2) : "";
+
+        return total;
+      }
+
+      function calcularDespesasOperacionais() {
+        // Calcula primeiro as despesas administrativas detalhadas
+        const despesasAdministrativas = calcularDespesasAdministrativas();
+
+        const despesasComerciais = getNumber("despesasComerciais");
+        const despesasPD = getNumber("despesasPD");
+        const despesasMarketing = getNumber("despesasMarketing");
+        const outrasDespesas = getNumber("outrasDespesasOperacionais");
+
+        const total =
+          despesasComerciais +
+          despesasAdministrativas +
+          despesasPD +
+          despesasMarketing +
+          outrasDespesas;
+
+        // Atualiza o campo total de despesas operacionais
+        document.getElementById("despesasOperacionais").value =
+          total > 0 ? total.toFixed(2) : "";
+
+        return total;
+      }
+
+      function calcularImpostosAutomaticos() {
+        const receitaBruta =
+          getNumber("receitaVps") +
+          getNumber("receitaCloud") +
+          getNumber("receitaDedicado") +
+          getNumber("receitaTrader") +
+          getNumber("outrasReceitas");
+        const deducoesVendas = getNumber("deducoesVendas");
+        const receitaLiquida = receitaBruta - deducoesVendas;
+        const custoServicos = getNumber("custoServicos");
+        const lucroBruto = receitaLiquida - custoServicos;
+        const despesasOperacionais = getNumber("despesasOperacionais");
+        const resultadoOperacional = lucroBruto - despesasOperacionais;
+        const resultadoFinanceiro = getNumber("resultadoFinanceiro");
+        const resultadoAntesIr = resultadoOperacional + resultadoFinanceiro;
+
+        let impostos = 0;
+
+        if (configTributaria.regime === "simples") {
+          // Simples Nacional: alíquota sobre a receita bruta
+          const aliquota = configTributaria.taxas.simples.aliquota || 0;
+          impostos = (receitaBruta * aliquota) / 100;
+        } else if (configTributaria.regime === "presumido") {
+          // Lucro Presumido: taxas sobre a receita bruta
+          const ir = configTributaria.taxas.presumido.ir || 0;
+          const csll = configTributaria.taxas.presumido.csll || 0;
+          const pis = configTributaria.taxas.presumido.pis || 0;
+          const cofins = configTributaria.taxas.presumido.cofins || 0;
+          impostos =
+            (receitaBruta * ir) / 100 +
+            (receitaBruta * csll) / 100 +
+            (receitaBruta * pis) / 100 +
+            (receitaBruta * cofins) / 100;
+        } else if (configTributaria.regime === "real") {
+          // Lucro Real: IR e CSLL sobre o lucro, PIS e COFINS sobre receita
+          const ir = configTributaria.taxas.real.ir || 0;
+          const csll = configTributaria.taxas.real.csll || 0;
+          const pis = configTributaria.taxas.real.pis || 0;
+          const cofins = configTributaria.taxas.real.cofins || 0;
+
+          // IR e CSLL sobre o lucro (resultado antes do IR)
+          const irLucro =
+            resultadoAntesIr > 0 ? (resultadoAntesIr * ir) / 100 : 0;
+          const csllLucro =
+            resultadoAntesIr > 0 ? (resultadoAntesIr * csll) / 100 : 0;
+
+          // PIS e COFINS sobre a receita bruta
+          const pisReceita = (receitaBruta * pis) / 100;
+          const cofinsReceita = (receitaBruta * cofins) / 100;
+
+          impostos = irLucro + csllLucro + pisReceita + cofinsReceita;
+        }
+
+        // Atualiza o campo de impostos
+        document.getElementById("impostoRenda").value =
+          impostos > 0 ? impostos.toFixed(2) : "";
+        document.getElementById("impostosCalculadosText").textContent =
+          formatMoney(impostos);
+
+        return impostos;
+      }
+
+      function salvarMesAtual() {
+        const periodo = document.getElementById("periodo").value;
+        if (!periodo) return;
+
+        // Calcula deduções, resultado financeiro, despesas operacionais e impostos antes de salvar
+        const deducoesCalculadas = calcularDeducoesAutomaticas();
+        const resultadoFinanceiroCalculado =
+          calcularResultadoFinanceiroAutomatico();
+        const despesasAdministrativas = calcularDespesasAdministrativas();
+        const despesasOperacionaisCalculadas = calcularDespesasOperacionais();
+        const impostosCalculados = calcularImpostosAutomaticos();
+
+        const dados = {
+          receitaVps: getNumber("receitaVps"),
+          receitaCloud: getNumber("receitaCloud"),
+          receitaDedicado: getNumber("receitaDedicado"),
+          receitaTrader: getNumber("receitaTrader"),
+          outrasReceitas: getNumber("outrasReceitas"),
+          // Salva as deduções, resultado financeiro e impostos calculados para referência, mas sempre recalcula
+          deducoesVendas: deducoesCalculadas,
+          custoServicos: getNumber("custoServicos"),
+          // Salva despesas operacionais detalhadas
+          despesasComerciais: getNumber("despesasComerciais"),
+          // Salva despesas administrativas detalhadas
+          admSalarios: getNumber("admSalarios"),
+          admAluguel: getNumber("admAluguel"),
+          admContabilidade: getNumber("admContabilidade"),
+          admTI: getNumber("admTI"),
+          admMaterial: getNumber("admMaterial"),
+          admOutras: getNumber("admOutras"),
+          despesasAdministrativas: despesasAdministrativas,
+          despesasPD: getNumber("despesasPD"),
+          despesasMarketing: getNumber("despesasMarketing"),
+          outrasDespesasOperacionais: getNumber("outrasDespesasOperacionais"),
+          despesasOperacionais: despesasOperacionaisCalculadas,
+          resultadoFinanceiro: resultadoFinanceiroCalculado,
+          impostoRenda: impostosCalculados,
+        };
+
+        dadosMensais[periodo] = dados;
+        localStorage.setItem(getStorageKey(periodo), JSON.stringify(dados));
+
+        // Feedback visual de salvamento
+        mostrarFeedbackSalvamento();
+
+        // Atualiza a grid de meses
+        atualizarGridMeses();
+      }
+
+      function mostrarFeedbackSalvamento() {
+        const indicator = document.getElementById("saveIndicator");
+        indicator.classList.add("saved");
+        indicator.innerHTML = '<span class="icon">✓</span><span>Salvo</span>';
+
+        setTimeout(() => {
+          indicator.classList.remove("saved");
+          indicator.innerHTML =
+            '<span class="icon">💾</span><span>Salvando...</span>';
+        }, 2000);
+      }
+
+      function atualizarGridMeses() {
+        const ano =
+          parseInt(document.getElementById("ano").value) ||
+          new Date().getFullYear();
+        const periodoAtual = document.getElementById("periodo").value;
+        const meses = [
+          "Jan",
+          "Fev",
+          "Mar",
+          "Abr",
+          "Mai",
+          "Jun",
+          "Jul",
+          "Ago",
+          "Set",
+          "Out",
+          "Nov",
+          "Dez",
+        ];
+
+        const grid = document.getElementById("mesesGrid");
+        grid.innerHTML = "";
+
+        let mesesPreenchidos = 0;
+
+        for (let mes = 1; mes <= 12; mes++) {
+          const mesStr = mes.toString().padStart(2, "0");
+          const periodo = `${ano}-${mesStr}`;
+          const stored = localStorage.getItem(getStorageKey(periodo));
+          const temDados = stored && JSON.parse(stored);
+
+          if (temDados) {
+            // Verifica se tem pelo menos um campo preenchido
+            const dados = JSON.parse(stored);
+            const temValor = Object.values(dados).some(
+              (v) => v && v !== 0 && v !== ""
+            );
+            if (temValor) mesesPreenchidos++;
+          }
+
+          const mesItem = document.createElement("div");
+          mesItem.className = "mes-item";
+          if (periodo === periodoAtual) mesItem.classList.add("ativo");
+          if (
+            temDados &&
+            JSON.parse(stored) &&
+            Object.values(JSON.parse(stored)).some(
+              (v) => v && v !== 0 && v !== ""
+            )
+          ) {
+            mesItem.classList.add("preenchido");
+          }
+
+          mesItem.innerHTML = `
+            <div class="mes-nome">${meses[mes - 1]}</div>
+            <div class="mes-indicador">${
+              temDados &&
+              JSON.parse(stored) &&
+              Object.values(JSON.parse(stored)).some(
+                (v) => v && v !== 0 && v !== ""
+              )
+                ? "✓"
+                : ""
+            }</div>
+          `;
+
+          mesItem.onclick = () => {
+            document.getElementById("periodo").value = periodo;
+            carregarMes(periodo);
+            atualizarDre();
+            atualizarAno();
+            atualizarGridMeses();
+          };
+
+          grid.appendChild(mesItem);
+        }
+
+        // Atualiza progresso
+        document.getElementById(
+          "progressoTexto"
+        ).textContent = `${mesesPreenchidos}/12 meses`;
+        const percentual = ((mesesPreenchidos / 12) * 100).toFixed(0);
+        document.getElementById(
+          "totalMesesPreenchidos"
+        ).textContent = `${percentual}% completo`;
+      }
+
+      function carregarMes(periodo) {
+        if (!periodo) return;
+
+        // Tenta carregar do localStorage primeiro
+        const stored = localStorage.getItem(getStorageKey(periodo));
+        let dados = stored ? JSON.parse(stored) : dadosMensais[periodo] || {};
+
+        // Preenche os campos
+        document.getElementById("receitaVps").value = dados.receitaVps || "";
+        document.getElementById("receitaCloud").value =
+          dados.receitaCloud || "";
+        document.getElementById("receitaDedicado").value =
+          dados.receitaDedicado || "";
+        document.getElementById("receitaTrader").value =
+          dados.receitaTrader || "";
+        document.getElementById("outrasReceitas").value =
+          dados.outrasReceitas || "";
+        // Não carrega deducoesVendas, resultadoFinanceiro e impostoRenda do storage, serão calculados automaticamente
+        // document.getElementById("deducoesVendas").value = dados.deducoesVendas || "";
+        document.getElementById("custoServicos").value =
+          dados.custoServicos || "";
+
+        // Carrega despesas operacionais detalhadas
+        document.getElementById("despesasComerciais").value =
+          dados.despesasComerciais || "";
+
+        // Carrega despesas administrativas detalhadas
+        document.getElementById("admSalarios").value = dados.admSalarios || "";
+        document.getElementById("admAluguel").value = dados.admAluguel || "";
+        document.getElementById("admContabilidade").value =
+          dados.admContabilidade || "";
+        document.getElementById("admTI").value = dados.admTI || "";
+        document.getElementById("admMaterial").value = dados.admMaterial || "";
+        document.getElementById("admOutras").value = dados.admOutras || "";
+        // Não carrega despesasAdministrativas total, será calculado automaticamente
+
+        document.getElementById("despesasPD").value = dados.despesasPD || "";
+        document.getElementById("despesasMarketing").value =
+          dados.despesasMarketing || "";
+        document.getElementById("outrasDespesasOperacionais").value =
+          dados.outrasDespesasOperacionais || "";
+        // Não carrega despesasOperacionais total, será calculado automaticamente
+        // document.getElementById("despesasOperacionais").value = dados.despesasOperacionais || "";
+        // document.getElementById("resultadoFinanceiro").value = dados.resultadoFinanceiro || "";
+        // document.getElementById("impostoRenda").value = dados.impostoRenda || "";
+
+        // Salva na memória também
+        dadosMensais[periodo] = dados;
+
+        // Recalcula deduções, resultado financeiro, despesas operacionais e impostos após carregar
+        calcularDeducoesAutomaticas();
+        calcularResultadoFinanceiroAutomatico();
+        calcularDespesasOperacionais();
+        calcularImpostosAutomaticos();
+      }
+
+      function limparMesAtual() {
+        if (!confirm("Deseja realmente limpar todos os dados do mês atual?"))
+          return;
+
+        document.getElementById("receitaVps").value = "";
+        document.getElementById("receitaCloud").value = "";
+        document.getElementById("receitaDedicado").value = "";
+        document.getElementById("receitaTrader").value = "";
+        document.getElementById("outrasReceitas").value = "";
+        document.getElementById("deducoesVendas").value = "";
+        document.getElementById("custoServicos").value = "";
+        document.getElementById("despesasComerciais").value = "";
+        // Limpa despesas administrativas detalhadas
+        document.getElementById("admSalarios").value = "";
+        document.getElementById("admAluguel").value = "";
+        document.getElementById("admContabilidade").value = "";
+        document.getElementById("admTI").value = "";
+        document.getElementById("admMaterial").value = "";
+        document.getElementById("admOutras").value = "";
+        document.getElementById("despesasAdministrativas").value = "";
+        document.getElementById("despesasPD").value = "";
+        document.getElementById("despesasMarketing").value = "";
+        document.getElementById("outrasDespesasOperacionais").value = "";
+        document.getElementById("despesasOperacionais").value = "";
+        document.getElementById("resultadoFinanceiro").value = "";
+        document.getElementById("impostoRenda").value = "";
+
+        const periodo = document.getElementById("periodo").value;
+        if (periodo) {
+          delete dadosMensais[periodo];
+          localStorage.removeItem(getStorageKey(periodo));
+        }
+
+        atualizarDre();
+        atualizarGridMeses();
+      }
+
+      function getNumber(id) {
+        const el = document.getElementById(id);
+        if (!el) return 0;
+        const raw = (el.value || "").trim();
+        if (!raw) return 0;
+        // Aceita vírgula ou ponto, bem simples
+        const normalized = raw.replace(",", ".");
+        const n = parseFloat(normalized);
+        return isNaN(n) ? 0 : n;
+      }
+
+      function formatMoney(valor) {
+        return valor.toLocaleString("pt-BR", {
+          style: "currency",
+          currency: "BRL",
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        });
+      }
+
+      function formatMoneyTxt(valor) {
+        return valor.toFixed(2).replace(".", ",");
+      }
+
+      function pct(valor, receitaLiquida) {
+        if (!receitaLiquida || receitaLiquida === 0) return "–";
+        return ((valor / receitaLiquida) * 100).toFixed(1) + "%";
+      }
+
+      function calcularDeducoesAno(ano, receitaBruta) {
+        const percentual = configTributaria.percentualDeducoes || 0;
+        return (receitaBruta * percentual) / 100;
+      }
+
+      function calcularResultadoFinanceiroAno(ano, receitaBruta) {
+        const percentual = configTributaria.percentualResultadoFinanceiro || 0;
+        return (receitaBruta * percentual) / 100;
+      }
+
+      function calcularImpostosAno(ano, receitaBruta, resultadoAntesIr) {
+        let impostos = 0;
+
+        if (configTributaria.regime === "simples") {
+          const aliquota = configTributaria.taxas.simples.aliquota || 0;
+          impostos = (receitaBruta * aliquota) / 100;
+        } else if (configTributaria.regime === "presumido") {
+          const ir = configTributaria.taxas.presumido.ir || 0;
+          const csll = configTributaria.taxas.presumido.csll || 0;
+          const pis = configTributaria.taxas.presumido.pis || 0;
+          const cofins = configTributaria.taxas.presumido.cofins || 0;
+          impostos =
+            (receitaBruta * ir) / 100 +
+            (receitaBruta * csll) / 100 +
+            (receitaBruta * pis) / 100 +
+            (receitaBruta * cofins) / 100;
+        } else if (configTributaria.regime === "real") {
+          const ir = configTributaria.taxas.real.ir || 0;
+          const csll = configTributaria.taxas.real.csll || 0;
+          const pis = configTributaria.taxas.real.pis || 0;
+          const cofins = configTributaria.taxas.real.cofins || 0;
+
+          const irLucro =
+            resultadoAntesIr > 0 ? (resultadoAntesIr * ir) / 100 : 0;
+          const csllLucro =
+            resultadoAntesIr > 0 ? (resultadoAntesIr * csll) / 100 : 0;
+          const pisReceita = (receitaBruta * pis) / 100;
+          const cofinsReceita = (receitaBruta * cofins) / 100;
+
+          impostos = irLucro + csllLucro + pisReceita + cofinsReceita;
+        }
+
+        return impostos;
+      }
+
+      function calcularAno(ano) {
+        let receitaBruta = 0;
+        let deducoesVendas = 0;
+        let custoServicos = 0;
+        let despesasOperacionais = 0;
+        let resultadoFinanceiro = 0;
+        let impostoRenda = 0;
+
+        // Carrega todos os meses do ano do localStorage
+        for (let mes = 1; mes <= 12; mes++) {
+          const mesStr = mes.toString().padStart(2, "0");
+          const periodo = `${ano}-${mesStr}`;
+          const stored = localStorage.getItem(getStorageKey(periodo));
+
+          if (stored) {
+            const dados = JSON.parse(stored);
+            receitaBruta +=
+              (dados.receitaVps || 0) +
+              (dados.receitaCloud || 0) +
+              (dados.receitaDedicado || 0) +
+              (dados.receitaTrader || 0) +
+              (dados.outrasReceitas || 0);
+            // Não soma deducoesVendas, resultadoFinanceiro e impostoRenda, serão recalculados
+            custoServicos += dados.custoServicos || 0;
+            despesasOperacionais += dados.despesasOperacionais || 0;
+          }
+        }
+
+        // Recalcula deduções e resultado financeiro automaticamente para o ano consolidado
+        deducoesVendas = calcularDeducoesAno(ano, receitaBruta);
+        resultadoFinanceiro = calcularResultadoFinanceiroAno(ano, receitaBruta);
+
+        const receitaLiquida = receitaBruta - deducoesVendas;
+        const lucroBruto = receitaLiquida - custoServicos;
+        const resultadoOperacional = lucroBruto - despesasOperacionais;
+        const resultadoAntesIr = resultadoOperacional + resultadoFinanceiro;
+
+        // Recalcula impostos automaticamente para o ano consolidado
+        impostoRenda = calcularImpostosAno(ano, receitaBruta, resultadoAntesIr);
+
+        const lucroLiquido = resultadoAntesIr - impostoRenda;
+
+        return {
+          receitaBruta,
+          deducoesVendas,
+          receitaLiquida,
+          custoServicos,
+          lucroBruto,
+          despesasOperacionais,
+          resultadoOperacional,
+          resultadoFinanceiro,
+          resultadoAntesIr,
+          impostoRenda,
+          lucroLiquido,
+        };
+      }
+
+      function atualizarAno() {
+        const ano =
+          parseInt(document.getElementById("ano").value) ||
+          new Date().getFullYear();
+        const consolidado = calcularAno(ano);
+
+        document.getElementById("anoTexto").textContent = ano;
+
+        document.getElementById("anoReceitaBruta").textContent = formatMoney(
+          consolidado.receitaBruta
+        );
+        document.getElementById("anoDeducoes").textContent = formatMoney(
+          -consolidado.deducoesVendas
+        );
+        document.getElementById("anoReceitaLiquida").textContent = formatMoney(
+          consolidado.receitaLiquida
+        );
+        document.getElementById("anoCustoServicos").textContent = formatMoney(
+          -consolidado.custoServicos
+        );
+        document.getElementById("anoLucroBruto").textContent = formatMoney(
+          consolidado.lucroBruto
+        );
+        document.getElementById("anoDespesasOperacionais").textContent =
+          formatMoney(-consolidado.despesasOperacionais);
+        document.getElementById("anoResultadoOperacional").textContent =
+          formatMoney(consolidado.resultadoOperacional);
+        document.getElementById("anoResultadoFinanceiro").textContent =
+          formatMoney(consolidado.resultadoFinanceiro);
+        document.getElementById("anoResultadoAntesIr").textContent =
+          formatMoney(consolidado.resultadoAntesIr);
+        document.getElementById("anoImpostoRenda").textContent = formatMoney(
+          -consolidado.impostoRenda
+        );
+        document.getElementById("anoLucroLiquido").textContent = formatMoney(
+          consolidado.lucroLiquido
+        );
+
+        document.getElementById("anoPctReceitaBruta").textContent = pct(
+          consolidado.receitaBruta,
+          consolidado.receitaLiquida
+        );
+        document.getElementById("anoPctDeducoes").textContent = pct(
+          -consolidado.deducoesVendas,
+          consolidado.receitaLiquida
+        );
+        document.getElementById("anoPctReceitaLiquida").textContent =
+          consolidado.receitaLiquida !== 0 ? "100%" : "–";
+        document.getElementById("anoPctCustoServicos").textContent = pct(
+          -consolidado.custoServicos,
+          consolidado.receitaLiquida
+        );
+        document.getElementById("anoPctLucroBruto").textContent = pct(
+          consolidado.lucroBruto,
+          consolidado.receitaLiquida
+        );
+        document.getElementById("anoPctDespesasOperacionais").textContent = pct(
+          -consolidado.despesasOperacionais,
+          consolidado.receitaLiquida
+        );
+        document.getElementById("anoPctResultadoOperacional").textContent = pct(
+          consolidado.resultadoOperacional,
+          consolidado.receitaLiquida
+        );
+        document.getElementById("anoPctResultadoFinanceiro").textContent = pct(
+          consolidado.resultadoFinanceiro,
+          consolidado.receitaLiquida
+        );
+        document.getElementById("anoPctResultadoAntesIr").textContent = pct(
+          consolidado.resultadoAntesIr,
+          consolidado.receitaLiquida
+        );
+        document.getElementById("anoPctImpostoRenda").textContent = pct(
+          -consolidado.impostoRenda,
+          consolidado.receitaLiquida
+        );
+        document.getElementById("anoPctLucroLiquido").textContent = pct(
+          consolidado.lucroLiquido,
+          consolidado.receitaLiquida
+        );
+      }
+
+      function exportarTxtAnual() {
+        const ano =
+          parseInt(document.getElementById("ano").value) ||
+          new Date().getFullYear();
+        const consolidado = calcularAno(ano);
+
+        const meses = [
+          "Janeiro",
+          "Fevereiro",
+          "Março",
+          "Abril",
+          "Maio",
+          "Junho",
+          "Julho",
+          "Agosto",
+          "Setembro",
+          "Outubro",
+          "Novembro",
+          "Dezembro",
+        ];
+
+        let txt = `DEMONSTRAÇÃO DO RESULTADO DO EXERCÍCIO (DRE)\n`;
+        txt += `SpeedCloud - Ano ${ano}\n`;
+        txt += `${"=".repeat(60)}\n\n`;
+
+        txt += `RESUMO CONSOLIDADO DO ANO\n`;
+        txt += `${"-".repeat(60)}\n\n`;
+
+        txt += `Receita Bruta                                    R$ ${formatMoneyTxt(
+          consolidado.receitaBruta
+        ).padStart(15)}\n`;
+        txt += `(-) Deduções de vendas                          R$ ${formatMoneyTxt(
+          -consolidado.deducoesVendas
+        ).padStart(15)}\n`;
+        txt += `${"-".repeat(60)}\n`;
+        txt += `Receita Líquida                                 R$ ${formatMoneyTxt(
+          consolidado.receitaLiquida
+        ).padStart(15)}\n`;
+        txt += `(-) Custo dos serviços                          R$ ${formatMoneyTxt(
+          -consolidado.custoServicos
+        ).padStart(15)}\n`;
+        txt += `${"-".repeat(60)}\n`;
+        txt += `Lucro Bruto                                     R$ ${formatMoneyTxt(
+          consolidado.lucroBruto
+        ).padStart(15)}\n`;
+        txt += `(-) Despesas operacionais                       R$ ${formatMoneyTxt(
+          -consolidado.despesasOperacionais
+        ).padStart(15)}\n`;
+        txt += `${"-".repeat(60)}\n`;
+        txt += `Resultado operacional                           R$ ${formatMoneyTxt(
+          consolidado.resultadoOperacional
+        ).padStart(15)}\n`;
+        txt += `(+/-) Resultado financeiro                      R$ ${formatMoneyTxt(
+          consolidado.resultadoFinanceiro
+        ).padStart(15)}\n`;
+        txt += `${"-".repeat(60)}\n`;
+        txt += `Resultado antes do IR                           R$ ${formatMoneyTxt(
+          consolidado.resultadoAntesIr
+        ).padStart(15)}\n`;
+        txt += `(-) IR / CSLL / Pro-labore                      R$ ${formatMoneyTxt(
+          -consolidado.impostoRenda
+        ).padStart(15)}\n`;
+        txt += `${"=".repeat(60)}\n`;
+        txt += `Lucro Líquido do período                        R$ ${formatMoneyTxt(
+          consolidado.lucroLiquido
+        ).padStart(15)}\n\n`;
+
+        // Percentuais
+        txt += `PERCENTUAIS SOBRE RECEITA LÍQUIDA\n`;
+        txt += `${"-".repeat(60)}\n\n`;
+        txt += `Receita Bruta                                   ${pct(
+          consolidado.receitaBruta,
+          consolidado.receitaLiquida
+        ).padStart(10)}\n`;
+        txt += `Deduções de vendas                              ${pct(
+          -consolidado.deducoesVendas,
+          consolidado.receitaLiquida
+        ).padStart(10)}\n`;
+        txt += `Receita Líquida                                 100,0%\n`;
+        txt += `Custo dos serviços                              ${pct(
+          -consolidado.custoServicos,
+          consolidado.receitaLiquida
+        ).padStart(10)}\n`;
+        txt += `Lucro Bruto                                     ${pct(
+          consolidado.lucroBruto,
+          consolidado.receitaLiquida
+        ).padStart(10)}\n`;
+        txt += `Despesas operacionais                           ${pct(
+          -consolidado.despesasOperacionais,
+          consolidado.receitaLiquida
+        ).padStart(10)}\n`;
+        txt += `Resultado operacional                           ${pct(
+          consolidado.resultadoOperacional,
+          consolidado.receitaLiquida
+        ).padStart(10)}\n`;
+        txt += `Resultado financeiro                            ${pct(
+          consolidado.resultadoFinanceiro,
+          consolidado.receitaLiquida
+        ).padStart(10)}\n`;
+        txt += `Resultado antes do IR                           ${pct(
+          consolidado.resultadoAntesIr,
+          consolidado.receitaLiquida
+        ).padStart(10)}\n`;
+        txt += `IR / CSLL / Pro-labore                          ${pct(
+          -consolidado.impostoRenda,
+          consolidado.receitaLiquida
+        ).padStart(10)}\n`;
+        txt += `Lucro Líquido                                   ${pct(
+          consolidado.lucroLiquido,
+          consolidado.receitaLiquida
+        ).padStart(10)}\n\n`;
+
+        // Detalhamento por mês
+        txt += `DETALHAMENTO POR MÊS\n`;
+        txt += `${"=".repeat(60)}\n\n`;
+
+        for (let mes = 1; mes <= 12; mes++) {
+          const mesStr = mes.toString().padStart(2, "0");
+          const periodo = `${ano}-${mesStr}`;
+          const stored = localStorage.getItem(getStorageKey(periodo));
+
+          if (stored) {
+            const dados = JSON.parse(stored);
+            const receitaBrutaMes =
+              (dados.receitaVps || 0) +
+              (dados.receitaCloud || 0) +
+              (dados.receitaDedicado || 0) +
+              (dados.receitaTrader || 0) +
+              (dados.outrasReceitas || 0);
+            const receitaLiquidaMes =
+              receitaBrutaMes - (dados.deducoesVendas || 0);
+            const lucroBrutoMes =
+              receitaLiquidaMes - (dados.custoServicos || 0);
+            const resultadoOperacionalMes =
+              lucroBrutoMes - (dados.despesasOperacionais || 0);
+            const resultadoAntesIrMes =
+              resultadoOperacionalMes + (dados.resultadoFinanceiro || 0);
+            const lucroLiquidoMes =
+              resultadoAntesIrMes - (dados.impostoRenda || 0);
+
+            txt += `${meses[mes - 1]} ${ano}\n`;
+            txt += `${"-".repeat(60)}\n`;
+            txt += `Receita Líquida                                 R$ ${formatMoneyTxt(
+              receitaLiquidaMes
+            ).padStart(15)}\n`;
+            txt += `Lucro Bruto                                     R$ ${formatMoneyTxt(
+              lucroBrutoMes
+            ).padStart(15)}\n`;
+            txt += `Resultado operacional                           R$ ${formatMoneyTxt(
+              resultadoOperacionalMes
+            ).padStart(15)}\n`;
+            txt += `Lucro Líquido                                    R$ ${formatMoneyTxt(
+              lucroLiquidoMes
+            ).padStart(15)}\n\n`;
+          }
+        }
+
+        txt += `\nGerado em: ${new Date().toLocaleString("pt-BR")}\n`;
+
+        // Criar e baixar arquivo
+        const blob = new Blob([txt], { type: "text/plain;charset=utf-8" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `DRE_SpeedCloud_${ano}.txt`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+
+        const statusEl = document.getElementById("exportStatus");
+        statusEl.textContent = `Arquivo DRE_SpeedCloud_${ano}.txt baixado com sucesso!`;
+        statusEl.classList.add("copied");
+        setTimeout(() => {
+          statusEl.textContent =
+            "Gera um arquivo TXT com o resumo completo da DRE anual.";
+          statusEl.classList.remove("copied");
+        }, 3000);
+      }
+
+      function atualizarDre() {
+        // Calcula deduções, resultado financeiro, despesas operacionais e impostos automaticamente primeiro
+        calcularDeducoesAutomaticas();
+        calcularResultadoFinanceiroAutomatico();
+        calcularDespesasOperacionais();
+        calcularImpostosAutomaticos();
+
+        const receitaVps = getNumber("receitaVps");
+        const receitaCloud = getNumber("receitaCloud");
+        const receitaDedicado = getNumber("receitaDedicado");
+        const receitaTrader = getNumber("receitaTrader");
+        const outrasReceitas = getNumber("outrasReceitas");
+        const deducoesVendas = getNumber("deducoesVendas");
+        const custoServicos = getNumber("custoServicos");
+        const despesasOperacionais = getNumber("despesasOperacionais");
+        const resultadoFinanceiro = getNumber("resultadoFinanceiro");
+        const impostoRenda = getNumber("impostoRenda");
+
+        const receitaBruta =
+          receitaVps +
+          receitaCloud +
+          receitaDedicado +
+          receitaTrader +
+          outrasReceitas;
+
+        const receitaLiquida = receitaBruta - deducoesVendas;
+        const lucroBruto = receitaLiquida - custoServicos;
+        const resultadoOperacional = lucroBruto - despesasOperacionais;
+        const resultadoAntesIr = resultadoOperacional + resultadoFinanceiro;
+        const lucroLiquido = resultadoAntesIr - impostoRenda;
+
+        // Inline
+        document.getElementById("receitaBrutaText").textContent =
+          formatMoney(receitaBruta);
+        document.getElementById("receitaLiquidaText").textContent =
+          formatMoney(receitaLiquida);
+        document.getElementById("lucroBrutoText").textContent =
+          formatMoney(lucroBruto);
+        document.getElementById("resultadoOperacionalText").textContent =
+          formatMoney(resultadoOperacional);
+        document.getElementById("resultadoAntesIrText").textContent =
+          formatMoney(resultadoAntesIr);
+        document.getElementById("lucroLiquidoText").textContent =
+          formatMoney(lucroLiquido);
+
+        // Tabela
+        document.getElementById("tbReceitaBruta").textContent =
+          formatMoney(receitaBruta);
+        document.getElementById("tbDeducoes").textContent = formatMoney(
+          -deducoesVendas
+        );
+        document.getElementById("tbReceitaLiquida").textContent =
+          formatMoney(receitaLiquida);
+        document.getElementById("tbCustoServicos").textContent = formatMoney(
+          -custoServicos
+        );
+        document.getElementById("tbLucroBruto").textContent =
+          formatMoney(lucroBruto);
+        document.getElementById("tbDespesasOperacionais").textContent =
+          formatMoney(-despesasOperacionais);
+        document.getElementById("tbResultadoOperacional").textContent =
+          formatMoney(resultadoOperacional);
+        document.getElementById("tbResultadoFinanceiro").textContent =
+          formatMoney(resultadoFinanceiro);
+        document.getElementById("tbResultadoAntesIr").textContent =
+          formatMoney(resultadoAntesIr);
+        document.getElementById("tbImpostoRenda").textContent = formatMoney(
+          -impostoRenda
+        );
+        document.getElementById("tbLucroLiquido").textContent =
+          formatMoney(lucroLiquido);
+
+        document.getElementById("tbPctReceitaBruta").textContent = pct(
+          receitaBruta,
+          receitaLiquida
+        );
+        document.getElementById("tbPctDeducoes").textContent = pct(
+          -deducoesVendas,
+          receitaLiquida
+        );
+        document.getElementById("tbPctReceitaLiquida").textContent =
+          receitaLiquida !== 0 ? "100%" : "–";
+        document.getElementById("tbPctCustoServicos").textContent = pct(
+          -custoServicos,
+          receitaLiquida
+        );
+        document.getElementById("tbPctLucroBruto").textContent = pct(
+          lucroBruto,
+          receitaLiquida
+        );
+        document.getElementById("tbPctDespesasOperacionais").textContent = pct(
+          -despesasOperacionais,
+          receitaLiquida
+        );
+        document.getElementById("tbPctResultadoOperacional").textContent = pct(
+          resultadoOperacional,
+          receitaLiquida
+        );
+        document.getElementById("tbPctResultadoFinanceiro").textContent = pct(
+          resultadoFinanceiro,
+          receitaLiquida
+        );
+        document.getElementById("tbPctResultadoAntesIr").textContent = pct(
+          resultadoAntesIr,
+          receitaLiquida
+        );
+        document.getElementById("tbPctImpostoRenda").textContent = pct(
+          -impostoRenda,
+          receitaLiquida
+        );
+        document.getElementById("tbPctLucroLiquido").textContent = pct(
+          lucroLiquido,
+          receitaLiquida
+        );
+
+        // Período texto
+        const periodoInput = document.getElementById("periodo").value;
+        document.getElementById("periodoTexto").textContent =
+          periodoInput || "sem período";
+      }
+
+      // Atualiza a cada digitação
+      const campos = [
+        "receitaVps",
+        "receitaCloud",
+        "receitaDedicado",
+        "receitaTrader",
+        "outrasReceitas",
+        "deducoesVendas",
+        "custoServicos",
+        "despesasComerciais",
+        // Campos detalhados de despesas administrativas
+        "admSalarios",
+        "admAluguel",
+        "admContabilidade",
+        "admTI",
+        "admMaterial",
+        "admOutras",
+        "despesasAdministrativas", // readonly, mas precisa estar na lista para atualizar quando outros campos mudarem
+        "despesasPD",
+        "despesasMarketing",
+        "outrasDespesasOperacionais",
+        "despesasOperacionais", // readonly, mas precisa estar na lista para atualizar quando outros campos mudarem
+        "resultadoFinanceiro",
+        "impostoRenda",
+      ];
+
+      campos.forEach((id) => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.addEventListener("input", () => {
+          salvarMesAtual();
+          atualizarDre();
+          atualizarAno();
+          atualizarGridMeses();
+        });
+        el.addEventListener("change", () => {
+          salvarMesAtual();
+          atualizarDre();
+          atualizarAno();
+          atualizarGridMeses();
+        });
+      });
+
+      // Event listeners para campos de taxas tributárias, deduções e resultado financeiro
+      const camposTaxas = [
+        "simplesAliquota",
+        "presumidoIR",
+        "presumidoCSLL",
+        "presumidoPIS",
+        "presumidoCOFINS",
+        "realIR",
+        "realCSLL",
+        "realPIS",
+        "realCOFINS",
+        "percentualDeducoesVendas",
+        "percentualResultadoFinanceiro",
+      ];
+
+      camposTaxas.forEach((id) => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.addEventListener("input", atualizarTaxas);
+        el.addEventListener("change", atualizarTaxas);
+      });
+
+      // Quando muda o período, carrega os dados do mês
+      document.getElementById("periodo").addEventListener("change", () => {
+        salvarMesAtual(); // Salva o mês anterior antes de trocar
+        const periodo = document.getElementById("periodo").value;
+        if (periodo) {
+          const [ano, mes] = periodo.split("-");
+          document.getElementById("ano").value = ano;
+          carregarMes(periodo);
+          atualizarDre();
+          atualizarAno();
+          atualizarGridMeses();
+        }
+      });
+
+      // Quando muda o ano, atualiza o resumo anual
+      document.getElementById("ano").addEventListener("change", () => {
+        salvarMesAtual(); // Salva antes de trocar
+        atualizarAno();
+        // Atualiza o input de mês para o mesmo ano
+        const ano = document.getElementById("ano").value;
+        const periodoAtual = document.getElementById("periodo").value;
+        if (periodoAtual) {
+          const [, mes] = periodoAtual.split("-");
+          document.getElementById("periodo").value = `${ano}-${mes}`;
+          carregarMes(`${ano}-${mes}`);
+          atualizarDre();
+        }
+        atualizarGridMeses();
+      });
+
+      // Inicialização
+      carregarConfigTributaria();
+
+      const hoje = new Date();
+      const anoAtual = hoje.getFullYear();
+      const mesAtual = (hoje.getMonth() + 1).toString().padStart(2, "0");
+      const periodoInicial = `${anoAtual}-${mesAtual}`;
+
+      document.getElementById("ano").value = anoAtual;
+      document.getElementById("periodo").value = periodoInicial;
+      carregarMes(periodoInicial);
+      atualizarDre();
+      atualizarAno();
+      atualizarGridMeses();
+
+      // COPIAR PARA PLANILHA (CSV)
+      function copiarLinhaPlanilha() {
+        const periodo = document.getElementById("periodo").value || "";
+        const receitaBruta =
+          getNumber("receitaVps") +
+          getNumber("receitaCloud") +
+          getNumber("receitaDedicado") +
+          getNumber("receitaTrader") +
+          getNumber("outrasReceitas");
+        const receitaLiquida = receitaBruta - getNumber("deducoesVendas");
+        const lucroBruto = receitaLiquida - getNumber("custoServicos");
+        const resultadoOperacional =
+          lucroBruto - getNumber("despesasOperacionais");
+        const resultadoAntesIr =
+          resultadoOperacional + getNumber("resultadoFinanceiro");
+        const lucroLiquido = resultadoAntesIr - getNumber("impostoRenda");
+
+        // CSV simples: periodo;receita_liquida;lucro_bruto;resultado_operacional;lucro_liquido
+        const valores = [
+          periodo,
+          receitaLiquida.toFixed(2).replace(".", ","),
+          lucroBruto.toFixed(2).replace(".", ","),
+          resultadoOperacional.toFixed(2).replace(".", ","),
+          lucroLiquido.toFixed(2).replace(".", ","),
+        ];
+        const linha = valores.join(";");
+
+        const statusEl = document.getElementById("copyStatus");
+
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(linha).then(
+            () => {
+              statusEl.textContent =
+                "Linha copiada! Vá na planilha, selecione uma célula e use Ctrl+V / Cmd+V.";
+              statusEl.classList.add("copied");
+            },
+            () => {
+              statusEl.textContent =
+                "Não foi possível copiar automaticamente. Linha: " + linha;
+            }
+          );
+        } else {
+          // fallback
+          statusEl.textContent = "Copie manualmente: " + linha;
+        }
+      }
+    </script>
+  </body>
+</html>
